@@ -171,8 +171,8 @@ if __name__ == '__main__':
 	ButtonDown = AAfilledRoundedRect(screen,(490,140,80,80),(200,20,20),0.5,unichr(0xf107),80)
 	ButtonVolumeUp = AAfilledRoundedRect(screen,(710,260,80,80),(200,20,20),0.5,unichr(0xf028))
 	ButtonVolumeDown = AAfilledRoundedRect(screen,(490,260,80,80),(200,20,20),0.5,unichr(0xf027))
-	ButtonStop = AAfilledRoundedRect(screen,(710,380,80,80),(200,20,20),0.5,unichr(0xf04d),50)
-	ButtonPlay = AAfilledRoundedRect(screen,(490,380,80,80),(200,20,20),0.5,unichr(0xf04b),50)
+	#ButtonStop = AAfilledRoundedRect(screen,(710,380,80,80),(200,20,20),0.5,unichr(0xf04d),50)
+	ButtonPlay = AAfilledRoundedRect(screen,(490,380,300,80),(200,20,20),0.5,unichr(0xf04c),50)
 	showcover(Albums[currentAlbum].getCover())
 	playlist = Albums[currentAlbum].getPlaylist()
 	player = Player(queue)
@@ -190,34 +190,48 @@ if __name__ == '__main__':
 					song = Albums[currentAlbum].getNextSong()
 					pygame.mixer.music.load(song)
 				elif ButtonDown.collidepoint(x ,y):
+					song = playlist.get()
+					player.load(os.path.normpath(os.path.realpath(song)))
 					log.debug("down")
 				elif ButtonLeft.collidepoint(x ,y):
 					log.debug("left")
 					currentAlbum += 1
 					showcover(Albums[currentAlbum].getCover())
-					pygame.display.flip()
+					player.stop()
 					playlist = Albums[currentAlbum].getPlaylist()
-					#player.
+					song = playlist.get()
+					player.loadpaused(os.path.normpath(os.path.realpath(song)))
+					ButtonPlay = AAfilledRoundedRect(screen,(490,380,300,80),(200,20,20),0.5,unichr(0xf04c),50)
 				elif ButtonRight.collidepoint(x ,y):
 					log.debug("right")
 					currentAlbum -= 1
 					showcover(Albums[currentAlbum].getCover())
-					pygame.display.flip()
-					song = Albums[currentAlbum].getNextSong()
-					pygame.mixer.music.load(song)
+					player.stop()
+					playlist = Albums[currentAlbum].getPlaylist()
+					song = playlist.get()
+					player.loadpaused(os.path.normpath(os.path.realpath(song)))
+					ButtonPlay = AAfilledRoundedRect(screen,(490,380,300,80),(200,20,20),0.5,unichr(0xf04c),50)
 				elif ButtonVolumeUp.collidepoint(x ,y):
 					log.debug("volumeup")
 					player.vol_plus_10()
 				elif ButtonVolumeDown.collidepoint(x ,y):
 					log.debug("volumedown")
 					player.vol_minus_10()
-				elif ButtonStop.collidepoint(x ,y):
-					log.debug("stop")
-					player.stop()
+				#elif ButtonStop.collidepoint(x ,y):
+				#	log.debug("stop")
+				#	player.stop()
 				elif ButtonPlay.collidepoint(x ,y):
 					log.debug("play")
-					song = playlist.get()
-					player.load(os.path.normpath(os.path.realpath(song)))
+					if player.playing:
+						player.pause()
+						ButtonPlay = AAfilledRoundedRect(screen,(490,380,300,80),(200,20,20),0.5,unichr(0xf04c),50)
+					if player.paused:
+						player.pause()
+						ButtonPlay = AAfilledRoundedRect(screen,(490,380,300,80),(200,20,20),0.5,unichr(0xf04b),50)
+					if player.stopped:
+						ButtonPlay = AAfilledRoundedRect(screen,(490,380,300,80),(200,20,20),0.5,unichr(0xf04b),50)
+						song = playlist.get()
+						player.load(os.path.normpath(os.path.realpath(song)))
 		font = pygame.font.SysFont("arial", 20)
 		if queue.qsize() > 0:
 		# Update all of the simple widgets from data in our queue
@@ -226,9 +240,9 @@ if __name__ == '__main__':
 			#print item
 
 			if ('progress' in item):
-				renderedText = font.render(str(int(item['progress']*100)), True, (0, 0, 0))
+				renderedText = font.render(str(100-int(item['progress']*100)), True, (0, 0, 0), (255,255,255))
 				#screen.fill((255,255,255))
-				screen.fill((255,255,255), rect=renderedText.get_rect(topleft=(0,0)))
+				#screen.fill((255,255,255), rect=renderedText.get_rect(topleft=(0,0)))
 				screen.blit(renderedText,(0,0))
 		#pygame.transform.rotate(ButtonPlay,10)
 		pygame.display.flip()

@@ -19,6 +19,9 @@ class Player(threading.Thread):
 		self.set_gain(60)
 		self.daemon    = True
 		self.start()
+		self.playing = False
+		self.stopped = True
+		self.paused  = False
 
 	def quit(self):
 		self.send('QUIT')
