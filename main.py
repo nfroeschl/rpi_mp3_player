@@ -133,7 +133,8 @@ def showcover(cover):
 
 	img = pygame.image.load(cover)
 
-	img = aspect_scale(img, (w, h))
+	img = aspect_scale(img, (480, 480))
+	pygame.draw.rect(screen,(255, 64, 64),(0,0,480,480))
 	screen.blit(img,(0,0))
 
 
@@ -144,7 +145,7 @@ if __name__ == '__main__':
 	pygame.mixer.pre_init(44100, -16, 2, 4096) # setup mixer to avoid sound lag
 
 	pygame.init()
-	white = (255, 64, 64)
+
 	w = 800
 	h = 480
 	currentAlbum = 0
@@ -154,7 +155,7 @@ if __name__ == '__main__':
 	else:
 		screen = pygame.display.set_mode((w, h),0,32)
 
-	screen.fill((white))
+	screen.fill(((255, 64, 64)))
 
 	Albums = []
 
@@ -187,13 +188,14 @@ if __name__ == '__main__':
 				if ButtonUp.collidepoint(x, y):
 					log.debug("up")
 					song = Albums[currentAlbum].getPrevSong()
-					player.load(os.path.normpath(os.path.realpath(song)))
+					player.loadpaused(os.path.normpath(os.path.realpath(song)))
 				elif ButtonDown.collidepoint(x ,y):
 					song = Albums[currentAlbum].getNextSong()
-					player.load(os.path.normpath(os.path.realpath(song)))
+					player.loadpaused(os.path.normpath(os.path.realpath(song)))
 					log.debug("down")
 				elif ButtonLeft.collidepoint(x ,y):
 					log.debug("left")
+					currentAlbum = currentAlbum % len(Albums)
 					currentAlbum += 1
 					showcover(Albums[currentAlbum].getCover())
 					player.stop()
@@ -202,6 +204,7 @@ if __name__ == '__main__':
 					ButtonPlay = AAfilledRoundedRect(screen,(490,380,300,80),(200,20,20),0.5,unichr(0xf04c),50)
 				elif ButtonRight.collidepoint(x ,y):
 					log.debug("right")
+					currentAlbum = currentAlbum % len(Albums)
 					currentAlbum -= 1
 					showcover(Albums[currentAlbum].getCover())
 					player.stop()
